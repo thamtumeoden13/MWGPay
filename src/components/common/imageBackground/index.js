@@ -24,3 +24,24 @@ const ImageBackgroundCom = (props) => {
     )
 }
 export default ImageBackgroundCom;
+
+const styles = StyleSheet.create({
+    containerContact: {
+        // flex: 1,
+        flexDirection: "row",
+        width: '100%',
+
+    },
+    inputPhoneNumber: {
+        width: '90%',
+        flexDirection: 'column',
+        paddingLeft: 10,
+    },
+    iconContact: {
+        flexDirection: 'column',
+        width: '10%',
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        height: 61,
+    },
+});

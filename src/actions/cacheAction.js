@@ -1,7 +1,6 @@
 import { GET_CACHE_REQUEST, GET_CACHE_SUCCESS, GET_CACHE_FAILURE, GET_CACHE_FROM_LOCAL } from "@constants/actionTypes";
 import { CACHE_HOSTNAME, API_HOST_LIST, CACHE_OBJECT_STORENAME } from "@constants/systemVars.js";
 import { callFetchAPI } from "./fetchAPIAction";
-// import SyncStorage from 'sync-storage';
 import AsyncStorage from '@react-native-community/async-storage';
 
 export function getCacheRequest(cacheKeyID) {
@@ -59,21 +58,11 @@ export function callGetCache(cacheKeyID) {
                     Message: "Đang gọi cache"
                 });
             }
+
             const localCacheData = AsyncStorage.getItem(cacheKeyID)
-            // if (StorageInfo) {
-            //     const userInfo = JSON.parse(StorageInfo)
-            //     if (userInfo) {
-            //         this.setState({
-            //             fullName: userInfo.fullName,
-            //             phoneNumber: userInfo.phoneNumber,
-            //             currentAmount: userInfo.currentAmount
-            //         })
-            //     }
-            // }
-            // const localCacheData = SyncStorage.get(cacheKeyID);
             //console.log("callGetCache cacheKeyID :", cacheKeyID, localCacheData);
             if (localCacheData != null) {
-                dispatch(getCacheFromCache(JSON.parse(localCacheData)));
+                dispatch(getCacheFromCache(localCacheData));
                 resolve({
                     IsError: false,
                     StatusID: 0,
@@ -112,7 +101,7 @@ export function callGetCacheFromServer(cacheKeyID) {
         };
         return dispatch(callFetchAPI(CACHE_HOSTNAME, apiPath, postData)).then((apiResult) => {
             if (!apiResult.IsError) {
-                // SyncStorage.set(cacheKeyID, apiResult.ResultObject);
+
                 AsyncStorage.setItem(cacheKeyID, JSON.stringify(apiResult.ResultObject));
             }
             return {

@@ -6,7 +6,6 @@ import { HashingSHA256 } from "@common/library/cryptography/DotNetRSACrypto.js";
 import { GUID, CreateAuthenData, CheckIsRegisterClient } from "@common/library/AuthenLib.js";
 import { callRegisterClient } from "./registerClient";
 
-// import SyncStorage from 'sync-storage';
 import AsyncStorage from '@react-native-community/async-storage';
 import { getNetInfo } from '@common/library/NetInfo'
 
@@ -59,7 +58,8 @@ export function callFetchAPI(hostname, apiPath, postData) {
         }
         //console.log("callFetchAPI  :", hostname, apiPath, postData);
         if (!CheckIsRegisterClient(state.RegisterClientInfo[hostname])) {
-            const username = state.LoginInfo.Username;
+
+            const username = state.LoginInfo.PhoneNumber;
             const password = state.LoginInfo.Password;
             //console.log("username:", username);
             return dispatch(callRegisterClient(hostname, username, password)).then((registerResult) => {
@@ -80,13 +80,11 @@ export function callFetchAPI(hostname, apiPath, postData) {
             );
         }
         else {
-            return dispatch(callAPI(hostname, apiPath, postData)).then(async (apiResult) => {
+            return dispatch(callAPI(hostname, apiPath, postData)).then((apiResult) => {
                 if (apiResult.StatusID == 7) {
                     const username = state.LoginInfo.Username;
                     const password = state.LoginInfo.Password;
-                    // SyncStorage.remove(hostname);
-                    await AsyncStorage.removeItem(hostname);
-
+                    AsyncStorage.removeItem(hostname);
 
                     return dispatch(callRegisterClient(hostname, username, password)).then((registerResult) => {
                         if (!registerResult.IsError) {

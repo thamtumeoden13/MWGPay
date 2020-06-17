@@ -1,24 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Text } from 'react-native'
 import { Input, Icon } from 'react-native-elements';
-import { InputUserName, InputPassword } from '../common/input'
+import { InputPhoneNumber, InputPassword } from '../common/input'
 
 export const SignInInput = (props) => {
-    const [userName, setUserName] = useState(props.userName)
+    const [phoneNumber, setPhoneNumber] = useState(props.phoneNumber)
     const [password, setPassword] = useState(props.password)
     const [errors, setErrors] = useState({})
 
-    const onChangeUserName = (value) => {
-        setUserName(value)
+    const onChangePhoneNumber = (value) => {
+        setPhoneNumber(value)
     }
     const onChangePassword = (value) => {
         setPassword(value)
     }
     useEffect(() => {
         if (props.onChangeInput)
-            props.onChangeInput(userName, password)
+            props.onChangeInput(phoneNumber, password)
         setErrors({})
-    }, [userName, password])
+    }, [phoneNumber, password])
 
     useEffect(() => {
         setErrors(props.errors)
@@ -26,9 +26,9 @@ export const SignInInput = (props) => {
 
     return (
         <View style={styles.signInInput}>
-            <InputUserName
-                userName={userName}
-                onChangeInput={onChangeUserName}
+            <InputPhoneNumber
+                phoneNumber={phoneNumber}
+                onChangeInput={onChangePhoneNumber}
                 errors={errors}
                 autoFocus={true}
             />

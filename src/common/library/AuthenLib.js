@@ -39,8 +39,7 @@ export function CreateLoginData(username, password, deviceID, state) {
     const passowrdMD5 = password;//MD5Digest(password);
     //console.log("password:", password);
     //console.log("passowrdMD5:", passowrdMD5);
-    const loginData = username + "|" + passowrdMD5 + "|100|2|" + deviceID;
-    console.log("CreateLoginData loginData: ", loginData);
+    const loginData = username + "|" + passowrdMD5 + "|" + deviceID + "|2|";
     const encryptLoginData = encryptData(serverPublicKey, 1024, loginData);
     return encryptLoginData;
     //const sendData = {ClientID: this.state.ClientID, LoginData: encryptLoginData};

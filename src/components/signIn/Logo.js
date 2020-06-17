@@ -5,7 +5,7 @@ export const Logo = () => {
 
     return (
         <View style={styles.mwgLogo}>
-            <Text style={styles.mwgLogoTitle} >Giao Hàng</Text>
+            <Text style={styles.mwgLogoTitle} >MWG</Text>
         </View>
     )
 }
@@ -16,14 +16,12 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         width: 150,
         height: 150,
-        backgroundColor: "green",
+        backgroundColor: "yellow",
         borderRadius: 75,
-        borderWidth: 2,
-        borderColor: '#ffee00',
         marginBottom: 50
     },
     mwgLogoTitle: {
-        color: '#ffee00',
+        color: 'black',
         fontSize: 28,
         fontWeight: 'bold',
     },

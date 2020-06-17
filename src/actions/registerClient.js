@@ -10,7 +10,6 @@ import WebRequest from "@common/library/net/WebRequest.js";
 import MD5Digest from "@common/library/cryptography/MD5Digest.js";
 import { GenRSAKey, encryptData, decryptData } from '@common/library/cryptography/DotNetRSACrypto.js';
 import { GUID, CreateLoginData } from "@common/library/AuthenLib.js";
-// import SyncStorage from 'sync-storage';
 import AsyncStorage from '@react-native-community/async-storage';
 import { getNetInfo } from '@common/library/NetInfo'
 
@@ -56,14 +55,14 @@ export function registerClientFailure(hostname, errorMessage) {
 }
 
 export function callRegisterClient(hostname, username, password) {
-    return async (dispatch, getState) => {
+    return (dispatch, getState) => {
+
         return new Promise(async (resolve, reject) => {
-            // const result = SyncStorage.get(hostname);
             const result = await AsyncStorage.getItem(hostname)
             // console.log("result", result);
             if (result != null) {
                 //console.log("result1", result);
-                dispatch(registerClientLoadFromLocal(hostname, JSON.parse(result)));
+                dispatch(registerClientLoadFromLocal(hostname, result));
                 resolve({
                     IsError: false,
                     Message: "Load register client from DB OK!"
@@ -104,7 +103,7 @@ export function callRegisterClientFromServer(hostname, username, password) {
         dispatch(registerClientRequest(hostname, clientID, key.PublicKey, key.PrivateKey));
         const sendData = {
             ClientID: clientID,
-            UserName: username,
+            PhoneNumber: username,
             Password: password,
             ClientPublicKey: key.PublicKey
         };
@@ -142,7 +141,6 @@ export function callRegisterClientFromServer(hostname, username, password) {
                         }
          
                         );*/
-                        // SyncStorage.set(hostname, saveRegisterClientData);
                         AsyncStorage.setItem(hostname, JSON.stringify(saveRegisterClientData));
                         dispatch(registerClientSuccess(hostname, plainServerPublicKey));
 

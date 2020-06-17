@@ -1,30 +1,21 @@
 import React, { Fragment } from 'react';
 import { View, StyleSheet, Text } from 'react-native'
-import { Avatar } from 'react-native-elements';
+
 export const Info = (props) => {
-    const { fullName, userName, uriAvatar } = props;
+    const { fullName, phoneNumber } = props;
 
     return (
-        <View style={{ alignItems: 'center' }}>
-            <Text style={{ fontSize: 18, textAlign: "center", fontWeight: "bold", color: "blue" }}>
+        <Fragment>
+            <Text style={{ fontSize: 18, textAlign: "center", fontWeight: "bold", color: "#525252" }}>
                 Xin chào!
-            </Text>
-            <Avatar
-                rounded
-                size="xlarge"
-                source={{
-                    uri: uriAvatar ? uriAvatar :
-                        'https://s3.amazonaws.com/uifaces/faces/twitter/adhamdannaway/128.jpg',
-                }}
-                containerStyle={{ marginVertical: 10 }}
-            />
-            <Text style={{ fontSize: 14, textAlign: "center", color: "#000" }}>
-                {userName}
-            </Text>
-            <Text style={{ fontSize: 16, textAlign: "center", color: "#000", fontWeight: 'bold' }}>
+                            </Text>
+            <Text style={{ fontSize: 16, textAlign: "center", color: "#000" }}>
                 {fullName}
             </Text>
-        </View>
+            <Text style={{ fontSize: 14, textAlign: "center", color: "#000" }}>
+                {phoneNumber}
+            </Text>
+        </Fragment>
     )
 }
 

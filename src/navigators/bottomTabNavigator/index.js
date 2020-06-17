@@ -1,56 +1,50 @@
 import React from 'react'
-// import {
-//     createBottomTabNavigator,
-// } from 'react-navigation';
 import {
     createBottomTabNavigator,
-} from 'react-navigation-tabs';
+} from 'react-navigation';
 
 import { Icon } from 'react-native-elements';
 
 import {
-    DeliveryStack,
+    HomeStack,
     HistoryStack,
-    NoticeStack,
+    PreferentialStack,
     ProfileStack
 } from '../stackNavigator'
 
 export const Tabs = createBottomTabNavigator(
     {
-        Delivery: {
-            screen: DeliveryStack,
+        Home: {
+            screen: HomeStack,
             navigationOptions: {
-                tabBarLabel: 'Giao Hàng',
+                tabBarLabel: 'MWG',
                 tabBarIcon: ({ tintColor }) => <Icon name="home" type="font-awesome" size={28} color={tintColor} />
             },
         },
         History: {
             screen: HistoryStack,
             navigationOptions: {
-                tabBarLabel: 'Lịch sử',
+                tabBarLabel: 'Lịch sử GD',
                 tabBarIcon: ({ tintColor }) => <Icon name="history" type="font-awesome" size={28} color={tintColor} />,
             },
         },
-        // Notice: {
-        //     screen: NoticeStack,
-        //     navigationOptions: {
-        //         tabBarLabel: 'Thông Báo',
-        //         tabBarIcon: ({ tintColor }) => <Icon name="gift" type="font-awesome" size={28} color={tintColor} />,
-        //         headerStyle: {
-        //             backgroundColor: '#633689',
-        //         },
-        //     },
-        // },
+        Preferential: {
+            screen: PreferentialStack,
+            navigationOptions: {
+                tabBarLabel: 'Ưu đãi',
+                tabBarIcon: ({ tintColor }) => <Icon name="gift" type="font-awesome" size={28} color={tintColor} />
+            },
+        },
         Profile: {
             screen: ProfileStack,
             navigationOptions: {
-                tabBarLabel: 'Cá Nhân',
+                tabBarLabel: 'Ví của tôi',
                 tabBarIcon: ({ tintColor }) => <Icon name="user" type="font-awesome" size={28} color={tintColor} />
             },
         },
     },
     {
-        initialRouteName: 'Delivery'
+        initialRouteName: 'Home'
     }
 );
 Tabs.navigationOptions = {

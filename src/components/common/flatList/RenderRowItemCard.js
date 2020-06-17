@@ -8,44 +8,23 @@ import {
     Image
 } from 'react-native';
 
-import { ListItem, Icon } from 'react-native-elements'
-import { formatDistanceToNowVi } from '@utils/function'
-
 export const RenderRowItemCard = (props) => {
+
     return (
         <TouchableOpacity onPress={() => props.onPress()}>
-            <View style={[styles.rowContainer, { backgroundColor: props.item.IsCancelDelivery ? "#f00" : "#93d5f6" }]}>
-                <View style={{ width: '100%' }}>
+            <View style={[styles.rowContainer, { backgroundColor: "#93d5f6" }]}>
+                <View style={{ width: '100%', height: 80, }}>
                     <View style={styles.rowLogo}>
                         <Image
-                            source={props.uri ? { uri: props.uri } : props.logo}
+                            source={props.logo}
                             resizeMode="cover"
                             style={styles.imageLogoBank}
                         />
                     </View>
                     <View style={styles.rowNumberSerial}>
-                        <ListItem
-                            title={`${props.item.ReceiverFullName}`}
-                            rightTitle={
-                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                    <Text style={{ fontSize: 12, textAlign: "left", color: '#000', fontWeight: '600' }}>#{props.item.ShipmentOrderID}</Text>
-                                </View>
-                            }
-                            subtitle={
-                                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                                    <Icon name='location-on' type='material' color='gray' size={24} />
-                                    <Text style={{ fontSize: 14, textAlign: "left", color: '#000' }}>{props.item.ReceiverAddress}</Text>
-                                </View>
-                            }
-                            rightSubtitle={
-                                formatDistanceToNowVi(props.item.CreatedDate)
-                            }
-                            containerStyle={{ backgroundColor: "transparent", width: '100%', height: '100%' }}
-                            titleStyle={{ fontSize: 18, width: "100%", textAlign: "left", color: "black", fontWeight: '600' }}
-                            rightTitleStyle={{ fontSize: 14, textAlign: "left", color: 'green' }}
-                            contentContainerStyle={{ flex: 3, height: 70, justifyContent: 'space-around', paddingRight: 15 }}
-                            rightContentContainerStyle={{ flex: 2, height: 70, justifyContent: 'space-around' }}
-                        />
+                        <Text style={styles.author} numberOfLines={1} ellipsizeMode={'tail'}>
+                            {props.item.CardMask}
+                        </Text>
                     </View>
                 </View>
             </View>
@@ -56,10 +35,10 @@ const styles = StyleSheet.create({
     rowContainer: {
         flexDirection: 'row',
         backgroundColor: '#FFF',
-        height: 144,
+        height: 100,
         width: "100%",
         marginTop: 10,
-        borderRadius: 8,
+        borderRadius: 4,
         shadowOffset: { width: 1, height: 1, },
         shadowColor: '#CCC',
         shadowOpacity: 1.0,
@@ -83,17 +62,12 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     rowLogo: {
-        height: 56,
-        width: '100%',
+        height: '70%',
         justifyContent: 'flex-start',
-        alignItems: 'center',
-        backgroundColor: 'rgba(0,0,0,0.2)',
-        padding: 5,
-        borderTopRightRadius: 8,
-        borderTopLeftRadius: 8,
+        alignItems: 'flex-start',
     },
     rowNumberSerial: {
-        height: 80,
+        height: '30%',
         justifyContent: 'center',
         alignItems: 'flex-start',
     },

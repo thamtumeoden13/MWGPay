@@ -42,7 +42,7 @@ class SignInScreenCom extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            userName: '', //0906145090
+            phoneNumber: '', //0906145090
             password: '', //123456
             isPasswordValid: true,
             isLoading: false,
@@ -63,12 +63,15 @@ class SignInScreenCom extends Component {
     }
 
     componentDidMount() {
+
         let uniqueId = DeviceInfo.getUniqueId();
         let modelName = DeviceInfo.getModel();
-        const userName = this.props.navigation.getParam('userName', '')
+        // console.log("uniqueId", uniqueId);
+        // console.log("modelName", modelName)
+        const phoneNumber = this.props.navigation.getParam('phoneNumber', '')
         const password = this.props.navigation.getParam('password', '')
         const isAutoSignIn = this.props.navigation.getParam('isAutoSignIn', false)
-        this.setState({ userName, password, isAutoSignIn, uniqueId, modelName })
+        this.setState({ phoneNumber, password, isAutoSignIn, uniqueId, modelName })
         setTimeout(async () => {
             const netInfo = await getNetInfo();
             if (!netInfo.status) {
@@ -118,38 +121,37 @@ class SignInScreenCom extends Component {
     }
 
     signIn = () => {
-        const { userName, password } = this.state
-        const subuserNameTheFirst = userName.substring(0, 1);
-        const subserName = userName.substring(0, 3);
+        const { phoneNumber, password } = this.state
+        const subPhoneNumberTheFirst = phoneNumber.substring(0, 1);
+        const subPhoneNumber = phoneNumber.substring(0, 3);
         let errors = {}
-        if (userName && userName.length > 0 && password.length > 0) {
-            const passwordMD5 = MD5Digest(password);
-            //const passwordSHA256 = HashingSHA256(password);
-            // console.log({ password, passwordMD5 })
-            this.registerClient(userName, passwordMD5);
+        if (phoneNumber && phoneNumber.length > 0 && phoneNumber.length == 10 && subPhoneNumberTheFirst == '0' && phoneNumber.indexOf('.') == -1 && PrefixMobileNumber.includes(subPhoneNumber) == true && regExNumber.test(phoneNumber) == true && password.length > 0) {
+            //const passwordMD5 = MD5Digest(password);
+            const passwordSHA256 = HashingSHA256(password);
+            this.registerClient(phoneNumber, passwordSHA256);
         }
         else {
             switch (true) {
-                // case userName.length <= 0:
-                //     errors.userName = 'Vui lòng nhập số điện thoại'
-                //     break;
-                // case subuserNameTheFirst != '0':
-                //     errors.userName = 'Số điện thoại bắt đầu bằng số 0';
-                //     break;
-                // case userName.indexOf('.') > -1:
-                //     errors.userName = 'Vui lòng luôn nhập số điện thoại là số!';
-                //     break;
-                // case userName.length < 10:
-                //     errors.userName = 'Số điện thoại phải đủ 10 số';
-                //     break;
-                // case password.length <= 0:
-                //     errors.password = 'Vui lòng nhập mật khẩu';
-                //     break;
-                case PrefixMobileNumber.includes(subuserName) == false:
-                    errors.userName = 'Đăng nhập không thành công. Sai tên truy cập hoặc mật khẩu.';
+                case phoneNumber.length <= 0:
+                    errors.phoneNumber = 'Vui lòng nhập số điện thoại'
                     break;
-                case regExNumber.test(userName) == false:
-                    errors.userName = 'Số điện thoại không đúng định dạng';
+                case subPhoneNumberTheFirst != '0':
+                    errors.phoneNumber = 'Số điện thoại bắt đầu bằng số 0';
+                    break;
+                case phoneNumber.indexOf('.') > -1:
+                    errors.phoneNumber = 'Vui lòng luôn nhập số điện thoại là số!';
+                    break;
+                case phoneNumber.length < 10:
+                    errors.phoneNumber = 'Số điện thoại phải đủ 10 số';
+                    break;
+                case password.length <= 0:
+                    errors.password = 'Vui lòng nhập mật khẩu';
+                    break;
+                case PrefixMobileNumber.includes(subPhoneNumber) == false:
+                    errors.phoneNumber = 'Đăng nhập không thành công. Sai tên truy cập hoặc mật khẩu.';
+                    break;
+                case regExNumber.test(phoneNumber) == false:
+                    errors.phoneNumber = 'Số điện thoại không đúng định dạng';
                     break;
             }
 
@@ -157,7 +159,44 @@ class SignInScreenCom extends Component {
         }
     }
 
-    asyncStorageData = async () => {
+    getWalletInfo = () => {
+        const APIHostName = "CustomerEWalletAPI";
+        const SearchAPIPath = "api/Wallet/LoadInfo";
+        this.props.callFetchAPI(APIHostName, SearchAPIPath, "").then(apiResult => {
+            if (apiResult && !apiResult.IsError) {
+                this.storeData(apiResult.ResultObject)
+                this.props.updateEWalletInfo(apiResult.ResultObject)
+                this.props.navigation.navigate('App');
+                this.asyncModalLoading();
+            }
+            else {
+                this.asyncModalLoading(true)
+                setTimeout(() => {
+                    this.setState({
+                        isModalAlert: true,
+                        typeModalAlert: 'error',
+                        titleModalAlert: 'Lỗi lấy thông tin ví',
+                        contentModalAlert: apiResult.Message
+                    })
+                }, 100);
+            }
+        });
+    }
+
+    storeData = async (result) => {
+        const userInfo = {
+            walletID: result.WalletID,
+            fullName: result.FullName,
+            phoneNumber: result.PhoneNumber,
+            currentAmount: result.DefaultAccountTotalAmount,
+            email: result.Email,
+            avatarImage: result.AvatarImage,
+            isVerifiedEmail: result.IsVerifiedEmail,
+            isUpdatedPersonalInfo: result.IsUpdatedPersonalInfo,
+            isVerifiedWalletAccount: result.IsVerifiedWalletAccount,
+            hasSignIn: true
+        }
+        await AsyncStorage.setItem('UserInfo', JSON.stringify(userInfo))
         const appSetting = {
             timeout: TIMEOUT_LOCK_SCREEN,
             allowTouchID: false
@@ -165,12 +204,10 @@ class SignInScreenCom extends Component {
         await AsyncStorage.setItem('AppSetting', JSON.stringify(appSetting))
     }
 
-    registerClient = (userName, password) => {
-        console.log({ AUTHEN_HOSTNAME, userName, password })
-        this.props.callRegisterClient(AUTHEN_HOSTNAME, userName, password).then((registerResult) => {
-            // console.log({ registerResult })
+    registerClient = (phoneNumber, password) => {
+        this.props.callRegisterClient(AUTHEN_HOSTNAME, phoneNumber, password).then((registerResult) => {
             if (registerResult && !registerResult.IsError) {
-                this.callLogin(userName, password);
+                this.callLogin(phoneNumber, password);
             }
             else {
                 this.asyncModalLoading(true)
@@ -186,17 +223,17 @@ class SignInScreenCom extends Component {
         });
     }
 
-    callLogin = (userName, password) => {
+    callLogin = (phoneNumber, password) => {
         let deviceID = DeviceInfo.getUniqueId();
-        this.props.callLogin(userName, password, deviceID).then((loginResult) => {
+        this.props.callLogin(phoneNumber, password, deviceID).then((loginResult) => {
             if (loginResult) {
-                this.asyncModalLoading()
                 if (!loginResult.IsError) {
-                    Keychain.setGenericPassword(userName, password);
-                    this.asyncStorageData()
-                    this.props.navigation.navigate('App');
+                    Keychain.setGenericPassword(phoneNumber, password);
+                    this.getWalletInfo();
+                    this.props.updateAccountBalance(loginResult.DefaultAccountTotalAmount);
                 }
                 else {
+                    this.asyncModalLoading()
                     setTimeout(() => {
                         const { type, title, content, action } = getDisplayDetailModalAlert(loginResult.StatusID, 'Lỗi đăng nhập', loginResult.Message)
                         this.setState({
@@ -223,14 +260,14 @@ class SignInScreenCom extends Component {
         });
     }
 
-    onChangeInput = (userName, password) => {
-        this.setState({ userName, password })
+    onChangeInput = (phoneNumber, password) => {
+        this.setState({ phoneNumber, password })
     }
 
-    getDeviceRegisterOTP = (userName) => {
+    getDeviceRegisterOTP = (phoneNumber) => {
         const APIHostName = "CustomerEWalletAPI";
         const SearchAPIPath = "api/Wallet/GetDeviceRegisterOTP";
-        this.props.callAPIWithoutAuthen(APIHostName, SearchAPIPath, userName).then(apiResult => {
+        this.props.callAPIWithoutAuthen(APIHostName, SearchAPIPath, phoneNumber).then(apiResult => {
             if (apiResult.IsError) {
                 this.asyncModalLoading();
                 setTimeout(() => {
@@ -281,18 +318,18 @@ class SignInScreenCom extends Component {
     }
 
     onCloseModalAlert = (value) => {
-        const { actionModalAlert, userName } = this.state
+        const { actionModalAlert, phoneNumber } = this.state
         this.setState({ isModalAlert: false, typeModalAlert: '', actionModalAlert: '' })
         if (actionModalAlert == '1') {
-            this.getDeviceRegisterOTP(userName)
+            this.getDeviceRegisterOTP(phoneNumber)
         }
     }
 
     goToNavigate = (walletRegOTPId) => {
-        const { userName, password, uniqueId, modelName } = this.state
+        const { phoneNumber, password, uniqueId, modelName } = this.state
         this.props.navigation.navigate("ConfirmOTPChangeDevice", {
             walletRegOTPId: walletRegOTPId,
-            userName: userName,
+            phoneNumber: phoneNumber,
             password: password,
             uniqueId: uniqueId,
             modelName: modelName,
@@ -301,7 +338,7 @@ class SignInScreenCom extends Component {
     }
 
     render() {
-        const { userName, password, errors, isLoading,
+        const { phoneNumber, password, errors, isLoading,
             isModalVisible, titleModal, contentModal,
             isModalAlert, typeModalAlert, titleModalAlert, contentModalAlert
         } = this.state;
@@ -330,21 +367,21 @@ class SignInScreenCom extends Component {
                     <ImageBackgroundCom>
                         <View style={styles.signInView}>
                             <Logo />
-                            <SignInInput userName={userName} password={password} errors={errors} onChangeInput={this.onChangeInput} />
+                            <SignInInput phoneNumber={phoneNumber} password={password} errors={errors} onChangeInput={this.onChangeInput} />
 
                             <SignInButton onPress={this.preSignIn} title="ĐĂNG NHẬP" />
 
-                            {/* <View style={{ width: "100%", height: 50, justifyContent: "center", flexDirection: 'row' }}>
+                            <View style={{ width: "100%", height: 50, justifyContent: "center", flexDirection: 'row' }}>
                                 <TouchableOpacity onPress={this.forgotPassword}>
                                     <Text style={{ color: '#03a5db' }}>Quên mật khẩu</Text>
                                 </TouchableOpacity>
-                            </View> */}
-                            {/* <View style={styles.registerAccount}>
+                            </View>
+                            <View style={styles.registerAccount}>
                                 <Text style={{ textAlign: 'center', color: "#000" }}>Bạn chưa có tài khoản MWGPay? </Text>
                                 <TouchableOpacity onPress={this.signUp}>
                                     <Text style={{ color: '#03a5db' }}>Đăng ký ngay</Text>
                                 </TouchableOpacity>
-                            </View> */}
+                            </View>
                         </View>
                         <View>
                             <ModalLoading
@@ -352,6 +389,7 @@ class SignInScreenCom extends Component {
                             />
                         </View>
                     </ImageBackgroundCom>
+
                 </KeyboardAwareScrollView>
             </View>
         );

@@ -35,7 +35,7 @@ export const InputPhoneNumber = (props) => {
             value={phoneNumber}
             inputStyle={{ marginLeft: 10, color: '#000' }}
             keyboardAppearance="light"
-            placeholder={"Nhập mã nhân viên(BCNB)"}
+            placeholder={"Nhập số điện thoại"}
             autoFocus={autoFocus}
             autoCapitalize="none"
             maxLength={10}

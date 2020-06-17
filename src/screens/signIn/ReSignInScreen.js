@@ -62,9 +62,8 @@ class ReSignInScreenCom extends Component {
 
         this.state = {
             isLoading: false,
-            userName: '',
+            phoneNumber: '',
             fullName: '',
-            uriAvatar: '',
             currentAmount: 0,
             password: '', //123456
             errors: {},
@@ -86,73 +85,76 @@ class ReSignInScreenCom extends Component {
 
     componentDidMount() {
         this.props.logout();
-        this.asyncStorageData();
+        this.storeData();
         let uniqueId = DeviceInfo.getUniqueId();
         let modelName = DeviceInfo.getModel();
         this.setState({ uniqueId, modelName })
-        this.focusListener = this.props.navigation.addListener('didFocus', () => {
-            setTimeout(async () => {
-                const appSetting = await this.appSettingData();
-                TouchID.isSupported(ConfigObject).then(biometryType => {
-                    if (appSetting.allowTouchID) {
-                        this.setState({
-                            isAutoFocus: false
-                        })
-                        this.clickHandler();
-                    }
+        setTimeout(async () => {
+            const appSetting = await this.appSettingData();
+            TouchID.isSupported(ConfigObject).then(biometryType => {
+                if (appSetting.allowTouchID) {
                     this.setState({
-                        allowTouchID: appSetting.allowTouchID
-                    });
-                }).catch(error => {
-                    const appSetting = {
-                        timeout: TIMEOUT_LOCK_SCREEN,
-                        allowTouchID: false
-                    }
-                    AsyncStorage.setItem('AppSetting', JSON.stringify(appSetting));
-                    this.setState({
-                        allowTouchID: false
+                        isAutoFocus: false
                     })
-                });
-                const netInfo = await getNetInfo();
-                if (!netInfo.status) {
-                    this.setState({
-                        titleModal: 'Lỗi đăng nhập',
-                        contentModal: "Không thể kết nối đến máy chủ",
-                        isModalVisible: true,
-                    })
+                    this.clickHandler();
                 }
-            }, 500);
-        });
-        // this.didBlurListener = this.props.navigation.addListener('didBlur', () => {
-        //     clearInterval(this.interval);
-        // });
+                this.setState({
+                    allowTouchID: appSetting.allowTouchID
+                });
+            }).catch(error => {
+                const appSetting = {
+                    timeout: TIMEOUT_LOCK_SCREEN,
+                    allowTouchID: false
+                }
+                AsyncStorage.setItem('AppSetting', JSON.stringify(appSetting));
+                this.setState({
+                    allowTouchID: false
+                })
+            });
+            const netInfo = await getNetInfo();
+            if (!netInfo.status) {
+                this.setState({
+                    titleModal: 'Lỗi đăng nhập',
+                    contentModal: "Không thể kết nối đến máy chủ",
+                    isModalVisible: true,
+                })
+            }
+        }, 100);
         // this.preSignIn()
     }
 
-    componentWillUnmount() {
-        this.focusListener.remove();
-        // this.didBlurListener.remove();
-        // clearInterval(this.interval);
-    }
-
     appSettingData = async () => {
-        const storageInfo = await AsyncStorage.getItem('AppSetting')
-        const appSetting = JSON.parse(storageInfo)
+        const StorageInfo = await AsyncStorage.getItem('AppSetting')
+        const appSetting = JSON.parse(StorageInfo)
         return appSetting
     }
 
-    asyncStorageData = async () => {
-        const storageInfo = await AsyncStorage.getItem('UserInfo')
-        if (storageInfo) {
-            const userInfo = JSON.parse(storageInfo)
-            // console.log({ userInfo })
+    storeData = async (result) => {
+        const StorageInfo = await AsyncStorage.getItem('UserInfo')
+        if (StorageInfo) {
+            const userInfo = JSON.parse(StorageInfo)
             if (userInfo) {
                 this.setState({
                     fullName: userInfo.fullName,
-                    userName: userInfo.userName,
-                    uriAvatar: userInfo.defaultPictureURL,
+                    phoneNumber: userInfo.phoneNumber,
+                    currentAmount: userInfo.currentAmount
                 })
             }
+        }
+        if (result) {
+            const userInfo = {
+                walletID: result.WalletID,
+                fullName: result.FullName,
+                phoneNumber: result.PhoneNumber,
+                currentAmount: result.DefaultAccountTotalAmount,
+                email: result.Email,
+                avatarImage: result.AvatarImage,
+                isVerifiedEmail: result.IsVerifiedEmail,
+                isUpdatedPersonalInfo: result.IsUpdatedPersonalInfo,
+                isVerifiedWalletAccount: result.IsVerifiedWalletAccount,
+                hasSignIn: true
+            }
+            await AsyncStorage.setItem('UserInfo', JSON.stringify(userInfo))
         }
     }
 
@@ -177,11 +179,11 @@ class ReSignInScreenCom extends Component {
     }
 
     signIn = () => {
-        const { userName, password } = this.state;
+        const { phoneNumber, password } = this.state;
         if (password.length > 0) {
-            const passwordMD5 = MD5Digest(password);
-            // const passwordSHA256 = HashingSHA256(password);
-            this.registerClient(userName, passwordMD5);
+            //const passwordMD5 = MD5Digest(password);
+            const passwordSHA256 = HashingSHA256(password);
+            this.registerClient(phoneNumber, passwordSHA256);
         }
         else {
             let errors = {}
@@ -285,11 +287,11 @@ class ReSignInScreenCom extends Component {
             });
     }
 
-    registerClient = (userName, password) => {
-        this.props.callRegisterClient(AUTHEN_HOSTNAME, userName, password).then((registerResult) => {
+    registerClient = (phoneNumber, password) => {
+        this.props.callRegisterClient(AUTHEN_HOSTNAME, phoneNumber, password).then((registerResult) => {
             if (registerResult) {
                 if (!registerResult.IsError) {
-                    this.callLogin(userName, password);
+                    this.callLogin(phoneNumber, password);
                 }
                 else {
                     this.asyncModalLoading(true)
@@ -317,17 +319,17 @@ class ReSignInScreenCom extends Component {
         });
     }
 
-    callLogin = (userName, password) => {
+    callLogin = (phoneNumber, password) => {
         let deviceID = DeviceInfo.getUniqueId();
-        this.props.callLogin(userName, password, deviceID).then((loginResult) => {
+        this.props.callLogin(phoneNumber, password, deviceID).then((loginResult) => {
             if (loginResult) {
-                this.asyncModalLoading();
                 if (!loginResult.IsError) {
-                    Keychain.setGenericPassword(userName, password);
-                    this.props.navigation.navigate('App');
+                    Keychain.setGenericPassword(phoneNumber, password);
+                    this.getWalletInfo();
                     this.props.updateAccountBalance(loginResult.DefaultAccountTotalAmount);
                 }
                 else {
+                    this.asyncModalLoading()
                     setTimeout(() => {
                         const { type, title, content, action } = getDisplayDetailModalAlert(loginResult.StatusID, 'Lỗi đăng nhập', loginResult.Message)
                         this.setState({
@@ -372,11 +374,11 @@ class ReSignInScreenCom extends Component {
         this.setState({ password: value, errors: {} })
     }
 
-    getDeviceRegisterOTP = (userName) => {
+    getDeviceRegisterOTP = (phoneNumber) => {
         const APIHostName = "CustomerEWalletAPI";
         const SearchAPIPath = "api/Wallet/GetDeviceRegisterOTP";
-        this.props.callAPIWithoutAuthen(APIHostName, SearchAPIPath, userName).then(apiResult => {
-            // console.log('getdevice', apiResult)
+        this.props.callAPIWithoutAuthen(APIHostName, SearchAPIPath, phoneNumber).then(apiResult => {
+            console.log('getdevice', apiResult)
             if (apiResult.IsError) {
                 this.asyncModalLoading();
                 setTimeout(() => {
@@ -410,19 +412,42 @@ class ReSignInScreenCom extends Component {
         this.setState({ isModalVisible: false })
     }
 
+    getWalletInfo = () => {
+        const APIHostName = "CustomerEWalletAPI";
+        const SearchAPIPath = "api/Wallet/LoadInfo";
+        this.props.callFetchAPI(APIHostName, SearchAPIPath, "").then(apiResult => {
+            //console.log("LoadInfo", { apiResult })
+            if (apiResult && !apiResult.IsError) {
+                this.storeData(apiResult.ResultObject)
+                this.props.updateEWalletInfo(apiResult.ResultObject)
+                this.props.navigation.navigate('App');
+                this.asyncModalLoading();
+            }
+            else {
+                this.asyncModalLoading(true)
+                this.setState({
+                    isModalAlert: true,
+                    typeModalAlert: 'error',
+                    titleModalAlert: 'Lỗi lấy thông tin ví',
+                    contentModalAlert: apiResult.Message
+                })
+            }
+        });
+    }
+
     onCloseModalAlert = (value) => {
-        const { actionModalAlert, userName } = this.state
+        const { actionModalAlert, phoneNumber } = this.state
         this.setState({ isModalAlert: false, typeModalAlert: '', actionModalAlert: '' })
         if (actionModalAlert == '1') {
-            this.getDeviceRegisterOTP(userName)
+            this.getDeviceRegisterOTP(phoneNumber)
         }
     }
 
     goToNavigate = (walletRegOTPId) => {
-        const { userName, password, uniqueId, modelName } = this.state
+        const { phoneNumber, password, uniqueId, modelName } = this.state
         this.props.navigation.navigate("ConfirmOTPChangeDevice", {
             walletRegOTPId: walletRegOTPId,
-            userName: userName,
+            phoneNumber: phoneNumber,
             password: password,
             uniqueId: uniqueId,
             modelName: modelName,
@@ -431,7 +456,7 @@ class ReSignInScreenCom extends Component {
     }
 
     render() {
-        const { userName, fullName, uriAvatar, password, isLoading,
+        const { phoneNumber, fullName, password, isLoading,
             errors, isModalVisible, titleModal, contentModal,
             allowTouchID, isAutoFocus,
             isModalAlert, typeModalAlert, titleModalAlert, contentModalAlert
@@ -462,8 +487,7 @@ class ReSignInScreenCom extends Component {
                         <View style={styles.containerInfo}>
                             <Info
                                 fullName={fullName}
-                                userName={userName}
-                                uriAvatar={uriAvatar}
+                                phoneNumber={phoneNumber}
                             />
                         </View>
                         <View style={styles.signInInput}>
@@ -547,7 +571,7 @@ const styles = StyleSheet.create({
     },
     containerInfo: {
         width: "95%",
-        height: 240,
+        height: 80,
         justifyContent: "space-around",
         marginVertical: 10,
         alignItems: "center"

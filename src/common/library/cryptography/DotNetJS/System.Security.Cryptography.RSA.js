@@ -281,6 +281,7 @@ System.Security.Cryptography.RSACryptoServiceProvider = function () {
 	this.FromXmlString = function (xmlString) {
 		var parameters = new System.Security.Cryptography.RSAParameters();
 		var tagSpace = new RegExp("\\s", "gi");
+		console.log(xmlString)
 		xmlString = xmlString.replace(tagSpace, "");
 		parameters.Exponent = getXmlValue(xmlString, "Exponent");
 		parameters.Modulus = getXmlValue(xmlString, "Modulus");
@@ -378,13 +379,13 @@ System.Security.Cryptography.RSACryptoServiceProvider = function () {
 		var digitSize = key.Modulus.length;
 		if (!fOAEP && rgb.length > digitSize - 11) {
 			msg = "The data to be encrypted exceeds the maximum for this modulus of " + key.digitSize + " bytes. Maximum data size is " + (key.digitSize - 11) + " bytes.";
-			// Trace.Write(msg);
+			Trace.Write(msg);
 			throw new System.Security.Cryptography.CryptographicException(msg);
 		}
 		if (fOAEP && rgb.length > digitSize - 42) {
 			// 41 = 1 (0x00) prefix + 20 seed + 20 label + 1 (0x01) separator.
 			msg = "The data to be encrypted exceeds the maximum for this modulus of " + key.digitSize + " bytes. Maximum data size is " + (key.digitSize - 42) + " bytes.";
-			// Trace.Write(msg);
+			Trace.Write(msg);
 			throw new System.Security.Cryptography.CryptographicException(msg);
 		}
 		return EncryptBytes.call(this, key, rgb, fOAEP);

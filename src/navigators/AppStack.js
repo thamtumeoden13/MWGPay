@@ -1,6 +1,7 @@
 
-//import {createStackNavigator,} from 'react-navigation';
-import { createStackNavigator } from 'react-navigation-stack';
+import {
+    createStackNavigator,
+} from 'react-navigation';
 import { Tabs } from './bottomTabNavigator'
 
 

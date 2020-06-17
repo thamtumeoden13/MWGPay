@@ -5,7 +5,8 @@ import {
     Text,
 } from 'react-native';
 import { Avatar } from 'react-native-elements';
-import QRCode from 'react-native-qrcode';
+// import QRCode from 'react-native-qrcode';
+import QRCode from 'react-native-qrcode-svg';
 import { connect } from 'react-redux';
 import { callFetchAPI } from "@actions/fetchAPIAction";
 
@@ -50,12 +51,27 @@ const QRCodeComponent = (props) => {
                     {userInfo.PhoneNumber}
                 </Text>
             </View>
-            <QRCode
+            {/* <QRCode
                 value={valueForQRCode}
                 size={250}
                 bgColor="#000"
                 fgColor="#fff"
                 style={{ marginTop: 20, }}
+            /> */}
+            <QRCode
+                value={valueForQRCode}
+                size={250}
+                color="#000"
+                backgroundColor="#fff"
+                style={{ marginTop: 20, }}
+                logo={{
+                    url:
+                        'https://raw.githubusercontent.com/AboutReact/sampleresource/master/logosmalltransparen.png',
+                }}
+                logoSize={30}
+                logoMargin={2}
+                logoBorderRadius={15}
+                logoBackgroundColor="yellow"
             />
         </View>
     );

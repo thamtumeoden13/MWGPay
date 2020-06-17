@@ -92,7 +92,7 @@ export const FlatListComponent = (props) => {
                 rowItem = <RenderRowItemModal key={index} index={index} item={item} indexSelect={indexSelect} onPress={() => onChangeIndexSelect(item, index)} />
                 break;
             case "RowItemCard":
-                rowItem = <RenderRowItemCard index={index} item={item} logo={props.logo} uri={props.uri} onPress={() => onPressItem(item, index)} />
+                rowItem = <RenderRowItemCard index={index} item={item} logo={props.logo} onPress={() => onPressItem(item, index)} />
                 break;
             case "MenuItemImage":
                 rowItem = <RenderRowItemImage key={index} index={index} item={item} numColumns={props.numColumns} onPress={() => onPressItem(item, index)} />
@@ -130,8 +130,6 @@ export const FlatListComponent = (props) => {
             ListHeaderComponent={props.headerTitle ? renderHeader(props.headerTitle) : null}
             ItemSeparatorComponent={props.isRenderSeparator == true ? renderSeparator : null}
             horizontal={props.horizontal ? props.horizontal : false}
-            showsHorizontalScrollIndicator={false}
-            showsVerticalScrollIndicator={false}
         />
     );
 }

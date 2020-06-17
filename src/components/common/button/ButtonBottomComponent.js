@@ -8,15 +8,14 @@ import { Button } from 'react-native-elements'
 export const ButtonBottomComponent = (props) => {
 
     return (
-        <View style={[styles.containerButtonGroup, props.containerButtonGroup]} >
+        <View style={styles.containerButtonGroup} >
             <Button
                 title={props.title ? props.title : "Xác nhận"}
-                buttonStyle={[styles.buttonStyle, props.buttonStyle]}
-                containerStyle={[styles.containerButton, props.containerButton]}
+                buttonStyle={styles.confirmButton}
+                containerStyle={styles.containerButton}
                 textStyle={styles.title}
                 type="solid"
                 onPress={props.onPress}
-                disabled={props.disabled}
             />
         </View>
     )
@@ -38,8 +37,8 @@ const styles = StyleSheet.create({
     title: {
         textAlign: 'center'
     },
-    buttonStyle: {
-        // backgroundColor: '#0f0',
+    confirmButton: {
+        // backgroundColor: 'blue',
         borderRadius: 2,
     }
 });

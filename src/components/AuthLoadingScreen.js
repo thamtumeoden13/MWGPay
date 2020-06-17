@@ -62,15 +62,15 @@ export default class AuthLoadingScreen extends React.Component {
                 })
             }
             else {
-                this.asyncStorageData();
+                this.storeData();
             }
         }, 2000);
     }
 
-    asyncStorageData = async () => {
-        const storageInfo = await AsyncStorage.getItem('UserInfo')
-        if (storageInfo) {
-            const userInfo = JSON.parse(storageInfo)
+    storeData = async () => {
+        const StorageInfo = await AsyncStorage.getItem('UserInfo')
+        if (StorageInfo) {
+            const userInfo = JSON.parse(StorageInfo)
             if (userInfo && userInfo.hasSignIn) {
                 this.props.navigation.navigate('ReSignIn', { isModalVisible: false, })
             }
@@ -92,8 +92,8 @@ export default class AuthLoadingScreen extends React.Component {
         const { isModalAlert, typeModalAlert, titleModalAlert, contentModalAlert
         } = this.state;
         return (
-            <View style={styles.container}>
-                {/* <ActivityIndicator size="large" color="#0000ff" /> */}
+            <View >
+                <ActivityIndicator size="large" color="#0000ff" />
                 <ModalCenterAlert
                     isCancel={true}
                     isOK={true}

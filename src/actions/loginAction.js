@@ -7,7 +7,6 @@ import { callRegisterClient } from "./registerClient";
 
 import { CreateLoginData, CheckIsRegisterClient } from "@common/library/AuthenLib.js";
 import AsyncStorage from '@react-native-community/async-storage';
-// import SyncStorage from 'sync-storage';
 import { getNetInfo } from '@common/library/NetInfo'
 
 export function loginRequest(username, password) {
@@ -94,12 +93,10 @@ export function callLogin(username, password, deviceID) {
             );
         }
         else {
-            return dispatch(callLoginAPI(username, password, deviceID)).then(async (apiResult) => {
+            return dispatch(callLoginAPI(username, password, deviceID)).then((apiResult) => {
                 if (apiResult.StatusID == 7) {
 
-                    // SyncStorage.remove(AUTHEN_HOSTNAME);
-                    await AsyncStorage.removeItem(AUTHEN_HOSTNAME);
-
+                    AsyncStorage.removeItem(AUTHEN_HOSTNAME);
 
                     return dispatch(callRegisterClient(AUTHEN_HOSTNAME, username, password)).then((registerResult) => {
                         if (!registerResult.IsError) {
@@ -159,21 +156,11 @@ export function callLoginAPI(username, password, deviceID) {
 
                         //this.testCallServices();
                         //this.setState({IsLoginOK: true});
-                        const userInfo = {
-                            defaultPictureURL: apiResult.ResultObject.LoginUserInfo.DefaultPictureURL,
-                            fullName: apiResult.ResultObject.LoginUserInfo.FullName,
-                            userName: apiResult.ResultObject.LoginUserInfo.UserName,
-                            hasSignIn: true
-                        }
-                        AsyncStorage.setItem("UserInfo", JSON.stringify(userInfo));
-
-                        // console.log("callLogin apiResult:", apiResult.ResultObject.LoginUserInfo);
-
                         return {
                             IsError: false,
                             StatusID: apiResult.StatusID,
                             Message: "",
-                            DefaultAccountTotalAmount: 0
+                            DefaultAccountTotalAmount: apiResult.ResultObject.LoginUserInfo.DefaultAccountTotalAmount
                         };
 
                     }

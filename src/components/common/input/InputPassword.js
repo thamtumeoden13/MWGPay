@@ -36,8 +36,8 @@ export const InputPassword = (props) => {
             autoCapitalize="none"
             autoFocus={autoFocus}
             autoCorrect={false}
-            // keyboardType="number-pad"
-            maxLength={20}
+            keyboardType="number-pad"
+            maxLength={6}
             blurOnSubmit={true}
             placeholderTextColor="#000"
             errorStyle={{ textAlign: 'left', fontSize: 12 }}

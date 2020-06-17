@@ -51,6 +51,7 @@ export function transform1To3Column(inputArray) {
 }
 
 export function bindDataToControl(listElement, dataSource) {
+    debugger;
     let listElement1 = listElement;
     //console.log("dataSource:", dataSource);
     //console.log("listElement:", listElement)
@@ -141,62 +142,69 @@ export function GetMLObjectDataList(mLObjectDefinition, formData, dataSource) {
 
     let MLObjectList = [];
     let arrayLength = 0;
-    Object.keys(formData).forEach(function (key) {
+    Object.keys(formData).forEach(function(key) {
 
         const templength = Object.keys(formData[key]).length;
-        if (templength > arrayLength) {
+        if(templength > arrayLength)
+        {
             arrayLength = templength;
         }
+      
+      });
 
-    });
-
-    if (dataSource != null) {
-        if (dataSource.length > arrayLength)
+    if(dataSource !=null)
+    {
+        if(dataSource.length > arrayLength)
             arrayLength = dataSource.length;
-    }
+    }  
 
     // console.log("dataSource:", dataSource);
-
-    for (let i = 0; i < arrayLength; i++) {
+    
+    for(let i = 0; i< arrayLength; i++)
+    {
         let MLObject = {};
         mLObjectDefinition.map((Item) => {
             const controlName = Item.BindControlName;
-
-            if (dataSource != null) {
-                if (dataSource[i] != null) {
-                    if (dataSource[i][Item.DataSourceMember] != null) {
-                        MLObject = Object.assign({}, MLObject, { [Item.Name]: dataSource[i][Item.DataSourceMember] });
+           
+            if(dataSource != null)
+            {
+                if(dataSource[i] != null)
+                {
+                    if(dataSource[i][Item.DataSourceMember] != null)
+                    {
+                        MLObject = Object.assign({}, MLObject, { [Item.Name]: dataSource[i][Item.DataSourceMember]});
                     }
                 }
             }
             if (controlName.length > 0) {
-
+               
 
                 if (formData[controlName] != null) {
-                    if (formData[controlName][i] != null) {
+                    if(formData[controlName][i] !=null)
+                    {
                         MLObject = Object.assign({}, MLObject, { [Item.Name]: formData[controlName][i].Value });
                     }
-
+                    
                 }
                 else {
-
+    
                 }
-
+    
             }
         });
-        if (!isEmpty(MLObject))
+        if(!isEmpty(MLObject))
             MLObjectList.push(MLObject);
 
     }
 
-
+    
 
     return MLObjectList;
 }
 
 export function isEmpty(obj) {
-    for (var prop in obj) {
-        if (obj.hasOwnProperty(prop))
+    for(var prop in obj) {
+        if(obj.hasOwnProperty(prop))
             return false;
     }
 

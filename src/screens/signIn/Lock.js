@@ -65,9 +65,8 @@ class LockCom extends Component {
 
         this.state = {
             isLoading: false,
-            userName: '',
+            phoneNumber: '',
             fullName: '',
-            uriAvatar: '',
             currentAmount: 0,
             password: '', //123456
             errors: {},
@@ -109,7 +108,7 @@ class LockCom extends Component {
             })
         });
 
-        this.asyncStorageData()
+        this.storeData()
         TouchID.isSupported()
             .then(biometryType => {
                 this.setState({ biometryType });
@@ -117,22 +116,33 @@ class LockCom extends Component {
     }
 
     appSettingData = async () => {
-        const storageInfo = await AsyncStorage.getItem('AppSetting')
-        const appSetting = JSON.parse(storageInfo)
+        const StorageInfo = await AsyncStorage.getItem('AppSetting')
+        const appSetting = JSON.parse(StorageInfo)
         return appSetting
     }
 
-    asyncStorageData = async () => {
-        const storageInfo = await AsyncStorage.getItem('UserInfo')
-        if (storageInfo) {
-            const userInfo = JSON.parse(storageInfo)
+    storeData = async (result) => {
+        const StorageInfo = await AsyncStorage.getItem('UserInfo')
+        if (StorageInfo) {
+            const userInfo = JSON.parse(StorageInfo)
             if (userInfo) {
                 this.setState({
                     fullName: userInfo.fullName,
-                    userName: userInfo.userName,
-                    uriAvatar: userInfo.defaultPictureURL
+                    phoneNumber: userInfo.phoneNumber,
+                    currentAmount: userInfo.currentAmount
                 })
             }
+        }
+        if (result) {
+            const userInfo = {
+                walletID: result.WalletID,
+                fullName: result.FullName,
+                phoneNumber: result.PhoneNumber,
+                currentAmount: result.DefaultAccountTotalAmount,
+                email: result.Email,
+                hasSignIn: true
+            }
+            await AsyncStorage.setItem('UserInfo', JSON.stringify(userInfo))
         }
     }
 
@@ -162,9 +172,9 @@ class LockCom extends Component {
 
     onSubmitUnLock = async () => {
         const { password } = this.state;
-        let passwordMD5 = await MD5Digest(password);
-        // let passwordSHA256 = HashingSHA256(password);
-        this.unlock(passwordMD5);
+        //let passwordMD5 = await MD5Digest(password);
+        let passwordSHA256 = HashingSHA256(password);
+        this.unlock(passwordSHA256);
     }
 
     signOut = async () => {
@@ -299,7 +309,7 @@ class LockCom extends Component {
     }
 
     render() {
-        const { userName, fullName, uriAvatar, password, isLoading, errors,
+        const { phoneNumber, fullName, password, isLoading, errors,
             isModalVisible, titleModal, contentModal, allowTouchID,
             isModalAlert, typeModalAlert, titleModalAlert, contentModalAlert
         } = this.state;
@@ -329,8 +339,7 @@ class LockCom extends Component {
                         <View style={styles.containerInfo}>
                             <Info
                                 fullName={fullName}
-                                userName={userName}
-                                uriAvatar={uriAvatar}
+                                phoneNumber={phoneNumber}
                             />
                         </View>
                         <View style={styles.signInInput}>
@@ -408,7 +417,7 @@ const styles = StyleSheet.create({
     },
     containerInfo: {
         width: "95%",
-        height: 240,
+        height: 80,
         justifyContent: "space-around",
         marginVertical: 10,
         alignItems: "center"

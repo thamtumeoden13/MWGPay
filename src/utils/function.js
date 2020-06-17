@@ -1,9 +1,5 @@
 import { Tile } from "react-native-elements";
 
-import formatDistanceToNow from 'date-fns/formatDistanceToNow'
-import isDate from 'date-fns/isDate'
-import viLocale from "date-fns/locale/vi";
-
 export const formatData = (data, numColumns) => {
     const numberOfFullRows = Math.floor(data.length / numColumns);
     let numberOfElementLastRows = data.length - (numColumns * numberOfFullRows);
@@ -31,25 +27,15 @@ export const formatMoney = (amount, decimalCount = 2, decimal = ".", thousands =
     }
 };
 
-export const getFormattedDate = (date = new Date(), hasHour = false, hasMinute = false) => {
-    const year = date.getFullYear();
+export const getFormattedDate = (date) => {
+    var year = date.getFullYear();
 
-    let month = (1 + date.getMonth()).toString();
+    var month = (1 + date.getMonth()).toString();
     month = month.length > 1 ? month : '0' + month;
 
-    let day = date.getDate().toString();
+    var day = date.getDate().toString();
     day = day.length > 1 ? day : '0' + day;
 
-    let hour = date.getHours().toString();
-    hour = hour.length > 1 ? hour : '0' + hour;
-
-    let minute = date.getMinutes().toString();
-    minute = minute.length > 1 ? minute : '0' + minute;
-
-    // console.log("111", hour + ':' + minute + ' ' + day + '/' + month + '/' + year, hasMinute, hasHour)
-
-    if (hasMinute) return hour + ':' + minute + ' ' + day + '/' + month + '/' + year;
-    if (hasHour) return hour + ' ' + day + '/' + month + '/' + year;
     return day + '/' + month + '/' + year;
 }
 
@@ -314,6 +300,8 @@ export const serviceFee = (dataItem, billDebtAmount) => {
     return serviceFee;
 }
 
+
+
 export const supportedTouchID = (name) => {
     let errerrorsMess = '';
     switch (name) {
@@ -440,14 +428,4 @@ export const getDisplayDetailModalAlert = (statusID, title, content, type = 'err
             break;
     }
     return { title, content, action, type }
-}
-
-export const formatDistanceToNowVi = (date = new Date().toISOString()) => {
-    let result = isDate(new Date(date))
-    if (result) {
-        return formatDistanceToNow(new Date(date),
-            { addSuffix: true, locale: viLocale }
-        )
-    }
-    return ''
 }

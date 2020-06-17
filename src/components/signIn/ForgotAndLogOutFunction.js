@@ -14,11 +14,11 @@ export const ForgotAndLogOutFunction = (props) => {
 
     return (
         <View style={styles.container}>
-            {/* <TouchableOpacity onPress={() => onForgotPassword()}>
+            <TouchableOpacity onPress={() => onForgotPassword()}>
                 <Text style={{ color: '#03a5db', fontSize: 16 }}>Quên mật khẩu</Text>
-            </TouchableOpacity> */}
+            </TouchableOpacity>
             <TouchableOpacity onPress={() => signOut()}>
-                <Text style={{ color: '#03a5db', fontSize: 16 }}>Đổi tài khoản</Text>
+                <Text style={{ color: '#000', fontSize: 16 }}>Đăng xuất</Text>
             </TouchableOpacity>
         </View>
     )
@@ -29,6 +29,6 @@ const styles = StyleSheet.create({
         height: 50,
         width: "95%",
         flexDirection: "row",
-        justifyContent: "center",
+        justifyContent: "space-between",
     }
 });

@@ -80,6 +80,6 @@ export const RenderRowItemImage = (props) => {
                     </View>
                 </View>
             </TouchableOpacity>
-        </View>
+        </View >
     )
 }
